@@ -1,13 +1,8 @@
-const SAVE_KEY = "myoho_quest_split_save_v3";
+const SAVE_KEY = "myoho_quest_split_save_v4";
 const PLAYER_MAX_HP = 100;
 const REVIEW_ENEMY_HP = 40;
 const CORRECT_DAMAGE = 20;
 const WRONG_DAMAGE = 15;
-
-let app = null;
-let state = defaultState();
-let battle = null;
-let pendingFinalAreaId = null;
 
 const SAFE_AREAS = typeof AREAS !== "undefined" && Array.isArray(AREAS) ? AREAS : [];
 const SAFE_QUESTIONS = typeof QUESTIONS !== "undefined" && Array.isArray(QUESTIONS) ? QUESTIONS : [];
@@ -16,6 +11,11 @@ const SAFE_TITLE_RULES = typeof TITLE_RULES !== "undefined" && Array.isArray(TIT
 const SAFE_STORY_TEXTS = typeof STORY_TEXTS !== "undefined" && STORY_TEXTS ? STORY_TEXTS : {};
 const SAFE_BATTLE_WORDS = typeof BATTLE_WORDS !== "undefined" && BATTLE_WORDS ? BATTLE_WORDS : {};
 const SAFE_CHARACTERS = typeof CHARACTERS !== "undefined" && CHARACTERS ? CHARACTERS : {};
+
+let app = null;
+let state = defaultState();
+let battle = null;
+let pendingFinalAreaId = null;
 
 function initGame() {
   app = document.getElementById("app");
