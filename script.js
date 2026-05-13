@@ -110,7 +110,7 @@ function showTitle() {
 
       <div class="box command-window">
         <h2>迷いを晴らす冒険へ</h2>
-        <p>相棒クローバードとともに、教学という「人を立たせる武器」を鍛えよう。</p>
+        <p>相棒クローバードとともに、教学という「人を励ます知恵」を集めよう。</p>
         <p>各地のまよいモンスターを倒し、最後はマヨイの塔にひそむ第六天の魔王へ挑みます。</p>
       </div>
 
@@ -135,7 +135,7 @@ function showNameInput() {
 
   const nameIntro = Array.isArray(SAFE_STORY_TEXTS.nameIntro) && SAFE_STORY_TEXTS.nameIntro.length
     ? SAFE_STORY_TEXTS.nameIntro
-    : ["旅立つ前に、君の名を刻め。", "この名前は、迷いに立ち向かう冒険者の名になる。"];
+    : ["旅立つ前に、冒険者の名前を決めましょう。", "この名前で、クローバードと一緒に迷いを晴らす旅へ出発します。"];
 
   let introHtml = "";
   nameIntro.forEach(function(text) {
@@ -228,11 +228,10 @@ function showPrologue() {
   const prologue = Array.isArray(SAFE_STORY_TEXTS.prologue) && SAFE_STORY_TEXTS.prologue.length
     ? SAFE_STORY_TEXTS.prologue
     : [
-        "世界に、静かな“迷い”が広がっていた。",
-        "その声を広げているのは、人のあきらめを力に変える存在――第六天の魔王。",
-        "主人公は、旅の途中で一羽の相棒と出会う。名はクローバード。",
-        "クローバードは低く言った。「教学は、飾りじゃない。人を立たせるための武器だ。」",
-        "こうして主人公は、教学という希望の武器を身につけるため、クローバードとともに旅立つ。"
+        "世界に、“迷い”の霧が広がっていた。",
+        "その声を広げているのは、第六天の魔王。",
+        "主人公は、小さな相棒クローバードと出会う。",
+        "こうして、希望の教学を集める旅が始まった。"
       ];
 
   let storyHtml = "";
@@ -344,11 +343,10 @@ function showBeforeFinal(areaId) {
   const story = Array.isArray(SAFE_STORY_TEXTS.beforeFinal) && SAFE_STORY_TEXTS.beforeFinal.length
     ? SAFE_STORY_TEXTS.beforeFinal
     : [
-        "六つの地に広がっていた迷いは晴れ、主人公の手には希望の武器が集まった。",
-        "しかし、マヨイの塔から、まだ暗い声が響いている。",
+        "六つの地に広がっていた迷いは晴れ、希望の武器が集まった。",
+        "けれど、マヨイの塔からは、まだ暗い声が響いている。",
         "第六天の魔王が待っている。人間をあきらめさせる、根本の迷いそのものが。",
-        "クローバードは翼を鳴らし、静かに前を見た。",
-        "「怖いなら、それでいい。怖さを抱えたまま進める奴が、本当に強い。行くぞ。最後の迷いを斬る。」"
+        "クローバードは少し震えながらも、前を向いた。"
       ];
 
   let storyHtml = "";
@@ -469,7 +467,7 @@ function showReviewMode() {
         <div class="box command-window">
           <h2>復習する問題はありません</h2>
           <p>クローバード「${escapeHtml(pickLine("review"))}」</p>
-          <p>今のところ、間違えた問題はありません。いい状態だ。</p>
+          <p>今のところ、間違えた問題はありません。すごいです…！</p>
         </div>
 
         <div class="btn-area">
@@ -515,8 +513,8 @@ function showEnding() {
   const afterword = Array.isArray(SAFE_STORY_TEXTS.endingAfterword) && SAFE_STORY_TEXTS.endingAfterword.length
     ? SAFE_STORY_TEXTS.endingAfterword
     : [
-        "クローバードは言った。「迷いは何度でも来る。だが、学び、励まし、行動する心があれば、人はまた立てる。」",
-        "「教学は、人を責めるための刃じゃない。人を立たせるための武器だ。忘れるなよ。」"
+        "クローバードは言った。「迷いは何度でも現れるけれど、学び、励まし、行動する心があれば、また立ち上がれます。」",
+        "「教学は、人を責めるためじゃなくて、人を励ますための知恵なんです…！」"
       ];
 
   let endingHtml = "";
@@ -614,7 +612,7 @@ function startBattle(areaId) {
     message: `${escapeHtml(area.boss)}「${escapeHtml(area.bossLine || "迷いの声が響いている…。")}」`
   };
 
-  Question();
+  nextQuestion();
 }
 
 function startReviewBattle() {
@@ -665,7 +663,7 @@ function startReviewBattle() {
     message: `クローバード「${escapeHtml(pickLine("review"))}」`
   };
 
-  Question();
+  nextQuestion();
 }
 
 function renderBattle() {
@@ -863,46 +861,10 @@ function nextQuestion() {
     battle.index = 0;
   }
 
-  function makeQuestionWithShuffledChoices(question) {
-  if (!question || !Array.isArray(question.choices)) {
-    return question;
-  }
-
-  const originalChoices = question.choices;
-  const originalAnswerIndex = Number(question.answer);
-  const correctChoice = originalChoices[originalAnswerIndex];
-
-  const choiceObjects = originalChoices.map(function(choice, index) {
-    return {
-      text: choice,
-      isCorrect: index === originalAnswerIndex
-    };
-  });
-
-  const shuffledChoices = shuffleArray(choiceObjects);
-
-  const newAnswerIndex = shuffledChoices.findIndex(function(choice) {
-    return choice.isCorrect;
-  });
-
-  return {
-    id: question.id,
-    area: question.area,
-    type: question.type,
-    question: question.question,
-    choices: shuffledChoices.map(function(choice) {
-      return choice.text;
-    }),
-    answer: newAnswerIndex >= 0 ? newAnswerIndex : originalAnswerIndex,
-    explanation: question.explanation,
-    powerText: question.powerText
-  };
-}
-
- battle.currentQuestion = makeQuestionWithShuffledChoices(battle.questions[battle.index]);
- battle.index++;
- battle.answered = false;
- battle.selected = null;
+  battle.currentQuestion = makeQuestionWithShuffledChoices(battle.questions[battle.index]);
+  battle.index++;
+  battle.answered = false;
+  battle.selected = null;
 
   if (battle.index === 1) {
     battle.message = `${escapeHtml(battle.area.boss)}「${escapeHtml(battle.area.bossLine || "迷いの声が響いている…。")}」`;
@@ -1029,8 +991,8 @@ function getTitleName() {
 
   if (state.clearedAreas.includes("tower")) return "ミョウホウ・チャンピオン";
   if (clearCount >= 5) return "広布の勇者";
-  if (clearCount >= 3) return "迷いを斬る冒険者";
-  if (clearCount >= 1 && rate >= 0.7) return "希望を鍛える者";
+  if (clearCount >= 3) return "迷いを晴らす冒険者";
+  if (clearCount >= 1 && rate >= 0.7) return "希望を学ぶ者";
   return "教学の旅人";
 }
 
@@ -1059,6 +1021,41 @@ function shuffleArray(array) {
   return copied;
 }
 
+function makeQuestionWithShuffledChoices(question) {
+  if (!question || !Array.isArray(question.choices)) {
+    return question;
+  }
+
+  const originalChoices = question.choices;
+  const originalAnswerIndex = Number(question.answer);
+
+  const choiceObjects = originalChoices.map(function(choice, index) {
+    return {
+      text: choice,
+      isCorrect: index === originalAnswerIndex
+    };
+  });
+
+  const shuffledChoices = shuffleArray(choiceObjects);
+
+  const newAnswerIndex = shuffledChoices.findIndex(function(choice) {
+    return choice.isCorrect;
+  });
+
+  return {
+    id: question.id,
+    area: question.area,
+    type: question.type,
+    question: question.question,
+    choices: shuffledChoices.map(function(choice) {
+      return choice.text;
+    }),
+    answer: newAnswerIndex >= 0 ? newAnswerIndex : originalAnswerIndex,
+    explanation: question.explanation,
+    powerText: question.powerText
+  };
+}
+
 function pickLine(category) {
   if (
     SAFE_CLOVERBIRD_LINES &&
@@ -1070,14 +1067,14 @@ function pickLine(category) {
     return lines[index];
   }
 
-  if (category === "correct") return "いい一撃だ。今の答えは、迷いに効いたぜ。";
-  if (category === "wrong") return "外したか。なら覚えろ。それで一歩前だ。";
-  if (category === "victory") return "よし。迷いは斬った。だが、次の戦いに備えろ。";
-  if (category === "defeat") return "倒れたか。だが、終わりじゃない。立ち上がるまでが勝負だ。";
-  if (category === "final") return "ここまで来たんだ。最後まで腹を決めろ。";
-  if (category === "review") return "復習だ。地味だが、こういう戦いが一番効く。";
+  if (category === "correct") return "その通りです…！ 知ることは、迷いを晴らす一歩です。";
+  if (category === "wrong") return "大丈夫です。今覚えれば、それが前進です…！";
+  if (category === "victory") return "すごいです…！ また一つ、教学の力が増えましたね。";
+  if (category === "defeat") return "えっと…大丈夫です。何度でも挑戦できます。";
+  if (category === "final") return "最後まで一緒です。希望の光を、消させません。";
+  if (category === "review") return "復習ですね。前より少し強くなれる時間です。";
 
-  return "焦るな。答えは、積み上げた学びの中にある。";
+  return "えっと…大丈夫です。少しずつ覚えていきましょう。";
 }
 
 function isFinalAreaUnlocked() {
@@ -1253,12 +1250,12 @@ window.getTitleName = getTitleName;
 window.addWrongQuestion = addWrongQuestion;
 window.removeWrongQuestion = removeWrongQuestion;
 window.shuffleArray = shuffleArray;
+window.makeQuestionWithShuffledChoices = makeQuestionWithShuffledChoices;
 window.pickLine = pickLine;
 window.isFinalAreaUnlocked = isFinalAreaUnlocked;
 window.escapeHtml = escapeHtml;
 window.escapeAttr = escapeAttr;
 window.addTempClass = addTempClass;
-window.makeQuestionWithShuffledChoices = makeQuestionWithShuffledChoices;
 
 document.addEventListener("DOMContentLoaded", function() {
   initGame();
