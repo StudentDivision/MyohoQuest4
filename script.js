@@ -614,7 +614,7 @@ function startBattle(areaId) {
     message: `${escapeHtml(area.boss)}「${escapeHtml(area.bossLine || "迷いの声が響いている…。")}」`
   };
 
-  nextQuestion();
+  Question();
 }
 
 function startReviewBattle() {
@@ -665,7 +665,7 @@ function startReviewBattle() {
     message: `クローバード「${escapeHtml(pickLine("review"))}」`
   };
 
-  nextQuestion();
+  Question();
 }
 
 function renderBattle() {
@@ -863,10 +863,46 @@ function nextQuestion() {
     battle.index = 0;
   }
 
-  battle.currentQuestion = battle.questions[battle.index];
-  battle.index++;
-  battle.answered = false;
-  battle.selected = null;
+  function makeQuestionWithShuffledChoices(question) {
+  if (!question || !Array.isArray(question.choices)) {
+    return question;
+  }
+
+  const originalChoices = question.choices;
+  const originalAnswerIndex = Number(question.answer);
+  const correctChoice = originalChoices[originalAnswerIndex];
+
+  const choiceObjects = originalChoices.map(function(choice, index) {
+    return {
+      text: choice,
+      isCorrect: index === originalAnswerIndex
+    };
+  });
+
+  const shuffledChoices = shuffleArray(choiceObjects);
+
+  const newAnswerIndex = shuffledChoices.findIndex(function(choice) {
+    return choice.isCorrect;
+  });
+
+  return {
+    id: question.id,
+    area: question.area,
+    type: question.type,
+    question: question.question,
+    choices: shuffledChoices.map(function(choice) {
+      return choice.text;
+    }),
+    answer: newAnswerIndex >= 0 ? newAnswerIndex : originalAnswerIndex,
+    explanation: question.explanation,
+    powerText: question.powerText
+  };
+}
+
+ battle.currentQuestion = makeQuestionWithShuffledChoices(battle.questions[battle.index]);
+ battle.index++;
+ battle.answered = false;
+ battle.selected = null;
 
   if (battle.index === 1) {
     battle.message = `${escapeHtml(battle.area.boss)}「${escapeHtml(battle.area.bossLine || "迷いの声が響いている…。")}」`;
@@ -1222,6 +1258,7 @@ window.isFinalAreaUnlocked = isFinalAreaUnlocked;
 window.escapeHtml = escapeHtml;
 window.escapeAttr = escapeAttr;
 window.addTempClass = addTempClass;
+window.makeQuestionWithShuffledChoices = makeQuestionWithShuffledChoices;
 
 document.addEventListener("DOMContentLoaded", function() {
   initGame();
